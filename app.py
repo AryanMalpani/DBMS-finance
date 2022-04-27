@@ -54,13 +54,13 @@ def index():
 
     profile = db.execute("SELECT username, cash FROM users WHERE id = ?", session["user_id"])
 
-    shares = db.execute("SELECT name, symbol, SUM(count) FROM usershares WHERE userid = ? GROUP BY symbol ORDER BY SUM(count) DESC", session["user_id"])
+    shares = db.execute("SELECT stockname, symbol, SUM(count) FROM usershares join stocknames on usershares.symbol = stocknames.stocksymbol WHERE userid = ? GROUP BY symbol ORDER BY SUM(count) DESC", session["user_id"])
 
     summary= []
 
     for share in shares:
         summary.append({
-            "name" : share["name"],
+            "name" : share["stockname"],
             "symbol" : share["symbol"],
             "count" : share["SUM(count)"],
             "prize" : lookup(share["symbol"])["price"],
@@ -87,15 +87,23 @@ def buy():
 
         x = datetime.datetime.now()
 
-        if stock is None or number is None or number == 0 :
+        if stock is None or number is None or number < 1 :
             return apology("error in stock name or number of shares", 400)
 
         if money < stock["price"] * number :
             return apology("lmao paisa nahi hein", 420)
 
+        shares = db.execute("SELECT stocksymbol FROM stocknames")
+        flag = 0
 
-        #if stock["symbol"] not in db.execute("SELECT symbol FROM usershares WHERE userid = ?",session["user_id"]) :
-        db.execute("INSERT INTO usershares (userid, name, symbol, count, cost, time) VALUES(?,?,?,?,?,?)", session["user_id"], stock["name"], stock["symbol"], number, stock["price"], x)
+        for share in shares:
+            if(share["stocksymbol"] == stock["symbol"]):
+                flag = 1
+        
+        if flag == 0:
+            db.execute("INSERT INTO stocknames (stocksymbol, stockname) values(?,?)", stock["symbol"], stock["name"])
+
+        db.execute("INSERT INTO usershares (userid, symbol, count, cost, time) VALUES(?,?,?,?,?)", session["user_id"], stock["symbol"], number, stock["price"], x)
 
         #else:
             #count = db.execute("SELECT count FROM usershares WHERE symbol = ? AND id = ?", stock["symbol"], session["user_id"])[0]["count"]
@@ -117,7 +125,7 @@ def buy():
 def history():
     """Show history of transactions"""
 
-    history = db.execute("SELECT * FROM usershares WHERE userid = ?", session["user_id"])
+    history = db.execute("SELECT * FROM usershares join stocknames on usershares.symbol = stocknames.stocksymbol WHERE userid = ?", session["user_id"])
 
     return render_template("history.html", history = history)
 
@@ -236,8 +244,17 @@ def sell():
 
         x = datetime.datetime.now()
 
+        shares = db.execute("SELECT stocksymbol FROM stocknames")
+        flag = 0
 
-        db.execute("INSERT INTO usershares (userid, name, symbol, count, cost, time) VALUES(?,?,?,?,?,?)", session["user_id"], stock["name"], stock["symbol"], number, stock["price"], x)
+        for share in shares:
+            if(share["stocksymbol"] == stock["symbol"]):
+                flag = 1
+        
+        if flag == 0:
+            db.execute("INSERT INTO stocknames (stocksymbol, stockname) values(?,?)", stock["symbol"], stock["name"])
+
+        db.execute("INSERT INTO usershares (userid, symbol, count, cost, time) VALUES(?,?,?,?,?)", session["user_id"], stock["symbol"], number, stock["price"], x)
 
 
         #count = db.execute("SELECT count FROM usershares WHERE symbol = ? AND id = ?", stock["symbol"], session["user_id"])[0]["count"]
