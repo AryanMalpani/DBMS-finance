@@ -103,7 +103,9 @@ def buy():
         if flag == 0:
             db.execute("INSERT INTO stocknames (stocksymbol, stockname) values(?,?)", stock["symbol"], stock["name"])
 
-        db.execute("INSERT INTO usershares (userid, symbol, count, cost, time) VALUES(?,?,?,?,?)", session["user_id"], stock["symbol"], number, stock["price"], x)
+        db.execute("INSERT INTO usershares (userid, symbol, count, time) VALUES(?,?,?,?)", session["user_id"], stock["symbol"], number, x)
+
+        db.execute("INSERT INTO stockcosts (stock_symbol, cost, time) VALUES(?,?,?)",stock["symbol"], stock["price"], x)
 
         #else:
             #count = db.execute("SELECT count FROM usershares WHERE symbol = ? AND id = ?", stock["symbol"], session["user_id"])[0]["count"]
@@ -205,7 +207,8 @@ def register():
 
         username = request.form.get("username")
 
-        db.execute("INSERT INTO users (username, hash) VALUES(?, ?)",username , generate_password_hash(request.form.get("password")))
+        db.execute("INSERT INTO users (username, hash, fname, lname, email) VALUES(?, ?, ?, ?, ?)",
+            username , generate_password_hash(request.form.get("password")), request.form.get("fname"), request.form.get("lname"), request.form.get("email"))
 
         rows = db.execute("SELECT * FROM users WHERE username = ?", username)
 
@@ -254,8 +257,9 @@ def sell():
         if flag == 0:
             db.execute("INSERT INTO stocknames (stocksymbol, stockname) values(?,?)", stock["symbol"], stock["name"])
 
-        db.execute("INSERT INTO usershares (userid, symbol, count, cost, time) VALUES(?,?,?,?,?)", session["user_id"], stock["symbol"], number, stock["price"], x)
+        db.execute("INSERT INTO usershares (userid, symbol, count, time) VALUES(?,?,?,?)", session["user_id"], stock["symbol"], number, x)
 
+        db.execute("INSERT INTO stockcosts (stock_symbol, cost, time) VALUES(?,?,?)",stock["symbol"], stock["price"], x)
 
         #count = db.execute("SELECT count FROM usershares WHERE symbol = ? AND id = ?", stock["symbol"], session["user_id"])[0]["count"]
         #db.execute("UPDATE usershares SET count = ? WHERE symbol = ? AND userid = ?",count + number, stock["symbol"], session["user_id"])
