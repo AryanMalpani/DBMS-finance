@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <h1>History</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Stock Name</th>
+                            <th>Symbol</th>
+                            <th>No. of shares owned</th>
+                            <th>INITIAL Price</th>
+                            <th>Value</th>
+
+                        </tr>
+                        <hr>
+                    </thead>
+                    <tbody>
+                        <!-- TODO: Loop through the database entries to display them in this table -->
+
+                        {% for row in history%}
+                            <tr>
+                                <td>{{row["time"]}}</td>
+                                <td>{{row["name"]}}</td>
+                                <td>{{row["symbol"]}}</td>
+                                <td>{{row["count"]}}</td>
+                                <td>{{row["cost"]}}</td>
+                                <td>{{row["cost"]*row["count"]}}</td>
+                            </tr>
+                        {% endfor%}
+                    </tbody>
+                </table>
+{% endblock %}

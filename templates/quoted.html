@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+    <h1>{{stock.name}}</h1>
+    Symbol = {{stock.symbol}}<br><hr>
+    <h2>Prize = ${{stock.price}}</h2>
+    <hr>
+    <a class="nav-link" href="/quote">Search Again</a>
+{% endblock %}

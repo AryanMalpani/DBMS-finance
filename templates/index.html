@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <h1>HOME</h1>
+    Username : {{profile["username"]}}<br>
+    Total Amount : ${{profile["cash"]}}<hr>
+
+    <h3>Your Stocks</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock Name</th>
+                            <th>Symbol</th>
+                            <th>No. of shares owned</th>
+                            <th>Current Price</th>
+                            <th>Current Value</th>
+
+                        </tr>
+                        <hr>
+                    </thead>
+                    <tbody>
+                        <!-- TODO: Loop through the database entries to display them in this table -->
+
+                        {% for row in summary%}
+                            <tr>
+                                <td>{{row["name"]}}</td>
+                                <td>{{row["symbol"]}}</td>
+                                <td>{{row["count"]}}</td>
+                                <td>{{row["prize"]}}</td>
+                                <td>{{row["value"]}}</td>
+                            </tr>
+                        {% endfor%}
+                    </tbody>
+                </table>
+{% endblock %}
