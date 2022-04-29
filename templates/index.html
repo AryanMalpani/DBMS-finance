@@ -26,6 +26,7 @@
                         <!-- TODO: Loop through the database entries to display them in this table -->
 
                         {% for row in summary%}
+                            {% if row["count"] != 0 %}
                             <tr>
                                 <td>{{row["name"]}}</td>
                                 <td>{{row["symbol"]}}</td>
@@ -33,6 +34,7 @@
                                 <td>{{row["prize"]}}</td>
                                 <td>{{row["value"]}}</td>
                             </tr>
+                            {% endif %}
                         {% endfor%}
                     </tbody>
                 </table>

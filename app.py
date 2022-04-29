@@ -54,7 +54,9 @@ def index():
 
     profile = db.execute("SELECT username, cash FROM users WHERE id = ?", session["user_id"])
 
-    shares = db.execute("SELECT stockname, symbol, SUM(count) FROM usershares join stocknames on usershares.symbol = stocknames.stocksymbol WHERE userid = ? GROUP BY symbol ORDER BY SUM(count) DESC", session["user_id"])
+    shares = db.execute("""SELECT stockname, symbol, SUM(count) FROM usershares 
+                           join stocknames on usershares.symbol = stocknames.stocksymbol 
+                           WHERE userid = ? GROUP BY symbol ORDER BY stockname""", session["user_id"])
 
     summary= []
 
@@ -105,7 +107,7 @@ def buy():
 
         db.execute("INSERT INTO usershares (userid, symbol, count, time) VALUES(?,?,?,?)", session["user_id"], stock["symbol"], number, x)
 
-        db.execute("INSERT INTO stockcosts (stock_symbol, cost, time) VALUES(?,?,?)",stock["symbol"], stock["price"], x)
+        db.execute("INSERT INTO stockcosts (stock_symbol, cost, buy_time) VALUES(?,?,?)",stock["symbol"], stock["price"], x)
 
         #else:
             #count = db.execute("SELECT count FROM usershares WHERE symbol = ? AND id = ?", stock["symbol"], session["user_id"])[0]["count"]
@@ -127,7 +129,10 @@ def buy():
 def history():
     """Show history of transactions"""
 
-    history = db.execute("SELECT * FROM usershares join stocknames on usershares.symbol = stocknames.stocksymbol WHERE userid = ?", session["user_id"])
+    history = db.execute("""SELECT * FROM usershares 
+                            join stocknames on usershares.symbol = stocknames.stocksymbol 
+                            join stockcosts on usershares.symbol = stockcosts.stock_symbol AND usershares.time = stockcosts.buy_time
+                            WHERE userid = ? ORDER BY time DESC""", session["user_id"])
 
     return render_template("history.html", history = history)
 
@@ -259,7 +264,7 @@ def sell():
 
         db.execute("INSERT INTO usershares (userid, symbol, count, time) VALUES(?,?,?,?)", session["user_id"], stock["symbol"], number, x)
 
-        db.execute("INSERT INTO stockcosts (stock_symbol, cost, time) VALUES(?,?,?)",stock["symbol"], stock["price"], x)
+        db.execute("INSERT INTO stockcosts (stock_symbol, cost, buy_time) VALUES(?,?,?)",stock["symbol"], stock["price"], x)
 
         #count = db.execute("SELECT count FROM usershares WHERE symbol = ? AND id = ?", stock["symbol"], session["user_id"])[0]["count"]
         #db.execute("UPDATE usershares SET count = ? WHERE symbol = ? AND userid = ?",count + number, stock["symbol"], session["user_id"])
